@@ -39,4 +39,3 @@ public class NewsResponse {
                 '}';
     }
 }
-// 0a8960e73a554712b217e2f2fd026174
