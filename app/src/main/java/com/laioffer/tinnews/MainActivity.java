@@ -34,25 +34,6 @@ public class MainActivity extends AppCompatActivity {
         NavigationUI.setupWithNavController(navView, navController);
         // bind navigation graph with top action bar
         NavigationUI.setupActionBarWithNavController(this, navController);
-
-        NewsApi api = RetrofitClient.newInstance().create(NewsApi.class);
-        api.getTopHeadlines("US").enqueue(new Callback<NewsResponse>() {
-            @Override
-            public void onResponse(@NonNull Call<NewsResponse> call,
-                                   @NonNull Response<NewsResponse> response) {
-                if (response.isSuccessful()) {
-                    assert response.body() != null;
-                    Log.d("getTopHeadlines", response.body().toString());
-                } else {
-                    Log.d("getTopHeadlines", response.toString());
-                }
-            }
-
-            @Override
-            public void onFailure(@NonNull Call<NewsResponse> call, @NonNull Throwable t) {
-                Log.d("getTopHeadlines", t.toString());
-            }
-        });
     }
 
     @Override
