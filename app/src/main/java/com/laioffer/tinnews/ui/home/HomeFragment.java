@@ -1,6 +1,7 @@
 package com.laioffer.tinnews.ui.home;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,7 +16,11 @@ import com.laioffer.tinnews.model.Article;
 import com.laioffer.tinnews.repository.NewsRepository;
 import com.laioffer.tinnews.repository.NewsViewModelFactory;
 import com.yuyakaido.android.cardstackview.CardStackLayoutManager;
+import com.yuyakaido.android.cardstackview.CardStackListener;
+import com.yuyakaido.android.cardstackview.Direction;
+import com.yuyakaido.android.cardstackview.Duration;
 import com.yuyakaido.android.cardstackview.StackFrom;
+import com.yuyakaido.android.cardstackview.SwipeAnimationSetting;
 
 import java.util.List;
 
@@ -24,7 +29,7 @@ import java.util.List;
  * Use the {@link HomeFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class HomeFragment extends Fragment {
+public class HomeFragment extends Fragment implements CardStackListener {
     private HomeViewModel viewModel;
     private FragmentHomeBinding binding;
     private CardStackLayoutManager layoutManager;
@@ -34,7 +39,6 @@ public class HomeFragment extends Fragment {
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
-    // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
 
@@ -50,7 +54,6 @@ public class HomeFragment extends Fragment {
      * @param param2 Parameter 2.
      * @return A new instance of fragment HomeFragment.
      */
-    // TODO: Rename and change types and number of parameters
     public static HomeFragment newInstance(String param1, String param2) {
         HomeFragment fragment = new HomeFragment();
         Bundle args = new Bundle();
@@ -83,13 +86,14 @@ public class HomeFragment extends Fragment {
 
         // Setup CardStackView
         CardSwipeAdapter swipeAdapter = new CardSwipeAdapter();
-        layoutManager = new CardStackLayoutManager(requireContext());
+        layoutManager = new CardStackLayoutManager(requireContext(), this);
         layoutManager.setStackFrom(StackFrom.Top);
         binding.homeCardStackView.setLayoutManager(layoutManager);
         binding.homeCardStackView.setAdapter(swipeAdapter);
 
         // Handle like unlike button clicks
-        // TODO
+        binding.homeLikeButton.setOnClickListener(v -> swipeCard(Direction.Right));
+        binding.homeUnlikeButton.setOnClickListener(v -> swipeCard(Direction.Left));
 
         NewsRepository repository = new NewsRepository();
         viewModel = new ViewModelProvider(this, new NewsViewModelFactory(repository))
@@ -104,5 +108,50 @@ public class HomeFragment extends Fragment {
                                 swipeAdapter.setArticles(articles);
                             }
                         });
+    }
+
+    private void swipeCard(Direction direction) {
+        SwipeAnimationSetting setting = new SwipeAnimationSetting.Builder()
+                .setDirection(direction)
+                .setDuration(Duration.Normal.duration)
+                .build();
+        layoutManager.setSwipeAnimationSetting(setting);
+        binding.homeCardStackView.swipe();
+    }
+
+    @Override
+    public void onCardSwiped(Direction direction) {
+        if (direction == Direction.Left) {
+            Log.d("CardStackView", "Unliked " + layoutManager.getTopPosition());
+        } else if (direction == Direction.Right) {
+            Log.d("CardStackView", "Liked " + layoutManager.getTopPosition());
+            Article article = articles.get(layoutManager.getTopPosition() - 1);
+            viewModel.setFavoriteArticleInput(article);
+        }
+    }
+
+    @Override
+    public void onCardDragging(Direction direction, float ratio) {
+
+    }
+
+    @Override
+    public void onCardRewound() {
+
+    }
+
+    @Override
+    public void onCardCanceled() {
+
+    }
+
+    @Override
+    public void onCardAppeared(View view, int position) {
+
+    }
+
+    @Override
+    public void onCardDisappeared(View view, int position) {
+
     }
 }
