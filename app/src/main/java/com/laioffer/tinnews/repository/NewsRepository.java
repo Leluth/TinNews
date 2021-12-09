@@ -13,6 +13,8 @@ import com.laioffer.tinnews.model.NewsResponse;
 import com.laioffer.tinnews.network.NewsApi;
 import com.laioffer.tinnews.network.RetrofitClient;
 
+import java.util.List;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -24,6 +26,12 @@ public class NewsRepository {
     public NewsRepository() {
         newsApi = RetrofitClient.newInstance().create(NewsApi.class);
         database = TinNewsApplication.getDatabase();
+    }
+
+    public LiveData<Boolean> favoriteArticle(Article article) {
+        MutableLiveData<Boolean> resultLiveData = new MutableLiveData<>();
+        new FavoriteAsyncTask(database, resultLiveData).execute(article);
+        return resultLiveData;
     }
 
     private static class FavoriteAsyncTask extends AsyncTask<Article, Void, Boolean> {
@@ -98,9 +106,14 @@ public class NewsRepository {
         return everyThingLiveData;
     }
 
-    public LiveData<Boolean> favoriteArticle(Article article) {
-        MutableLiveData<Boolean> resultLiveData = new MutableLiveData<>();
-        new FavoriteAsyncTask(database, resultLiveData).execute(article);
-        return resultLiveData;
+    public LiveData<List<Article>> getAllSavedArticles() {
+        return database.articleDao().getAllArticles();
     }
+
+    // Notice the using a simpler version of the AsyncTask to run deleteArticle operation
+    // It’s convenient when you don’t care about the result or the intermediate progress
+    public void deleteSavedArticle(Article article) {
+        AsyncTask.execute(() -> database.articleDao().deleteArticle(article));
+    }
+
 }
