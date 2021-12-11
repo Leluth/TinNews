@@ -58,7 +58,7 @@ public class CardSwipeAdapter extends RecyclerView.Adapter<CardSwipeAdapter.Card
         Article article = articles.get(position);
         holder.titleTextView.setText(article.title);
         holder.descriptionTextView.setText(article.description);
-        Picasso.get().load(article.urlToImage).into(holder.imageView);
+        Picasso.get().load(article.urlToImage).fit().into(holder.imageView);
     }
 
     @Override

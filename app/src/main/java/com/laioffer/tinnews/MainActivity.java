@@ -33,7 +33,7 @@ public class MainActivity extends AppCompatActivity {
         // bind navigation graph with bottom navigation view
         NavigationUI.setupWithNavController(navView, navController);
         // bind navigation graph with top action bar
-        NavigationUI.setupActionBarWithNavController(this, navController);
+        // NavigationUI.setupActionBarWithNavController(this, navController);
     }
 
     @Override
